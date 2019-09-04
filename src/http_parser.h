@@ -9,33 +9,24 @@
 
 namespace lite {
 
-class HttpParser
-{
+class HttpParser{
 public:
-    /// Construct ready to parse the request method.
     HttpParser();
 
-    /// Reset to initial parser state.
+    // Reset to initial parser state.
     void Reset();
 
-    /// Result of parse.
-    enum result_type
-    {
+    // Result of parse.
+    enum result_type{
         good,
         bad,
         indeterminate
     };
 
-    /// Parse some data. The enum return value is good when a complete request has
-    /// been parsed, bad if the data is invalid, indeterminate when more data is
-    /// required. The InputIterator return value indicates how much of the input
-    /// has been consumed.
     template <typename InputIterator>
     std::tuple<result_type, InputIterator> Parse(Request &req,
-                                                 InputIterator begin, InputIterator end)
-    {
-        while (begin != end)
-        {
+        InputIterator begin, InputIterator end){
+        while (begin != end){
             result_type result = Consume(req, *begin++);
             if (result == good || result == bad)
                 return std::make_tuple(result, begin);
@@ -65,8 +56,7 @@ private:
     static bool is_separators(int c);
 
     /// The current state of the parser.
-    enum state
-    {
+    enum state{
         method_start,
         method,
         uri,

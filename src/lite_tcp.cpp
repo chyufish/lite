@@ -25,7 +25,6 @@ void TcpServer::Run(){
     Init();
     for(;;){
         int nfds=lite_event_.Wait(-1);
-        LogInfo("waiting...\n");
         if(nfds==-1){
             exit(EXIT_FAILURE);
         }
@@ -34,7 +33,7 @@ void TcpServer::Run(){
             if(sock_fd==fd_){
                 Accept();
             }else{
-                LogInfo("request from %d\n",sock_fd);
+                //LogInfo("request from %d\n",sock_fd);
                 thread_pool_.Submit(std::bind(&Connection::Handle,connection_manager_.GetConnection(sock_fd)));
             }
         }
@@ -124,7 +123,7 @@ void TcpServer::Accept(){
         int client=accept(fd_, (struct sockaddr *)&their_addr, &sin_size);
         if(client==-1){
             if(errno==EAGAIN || errno==EWOULDBLOCK){
-                LogInfo("Accept over\n");
+                //LogInfo("Accept over\n");
                 break;
             }
             LogError("Server: accept %s\n",strerror(errno));       
@@ -146,7 +145,7 @@ void TcpServer::Accept(){
     
         std::string log_msg="Accept a connection from "+client_addr+":"+std::to_string(port);
         log_msg=log_msg+", fileno is "+std::to_string(client);
-        LogInfo(log_msg.c_str());
+        //LogInfo(log_msg.c_str());
 
         if(!SetNonBlock(client)){
             continue;

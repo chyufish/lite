@@ -1,10 +1,10 @@
 cc = g++
-OBJ = lite_server.o lite_tcp.o lite_event.o connection.o request_handler.o http_parser.o request.o log.o
+OBJ = lite.o lite_tcp.o lite_event.o connection.o request_handler.o http_parser.o request.o log.o
 
-test : $(OBJ)
-	$(cc) -o lite_server $(OBJ) -pthread
+lite : $(OBJ)
+	$(cc) -o lite $(OBJ) -pthread
 
-lite_server.o : lite_tcp.h lite_event.h request_handler.h request.h connection.h \
+lite.o : lite_tcp.h lite_event.h request_handler.h request.h connection.h \
 	http_parser.h thread_pool.h buffer.h connection_manager.h
 lite_tcp.o : lite_tcp.h lite_event.h request_handler.h request.h connection.h \
 	http_parser.h log.h thread_pool.h buffer.h connection_manager.h

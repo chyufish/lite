@@ -26,8 +26,8 @@ public:
     void Handle();
     void stop();
 
-    int Fd(){return fd_;}
-    ConnectionState State(){return state_;}
+    int Fd() const{return fd_;}
+    ConnectionState State() const{return state_;}
 
 private:
     ConnectionState state_;

@@ -24,6 +24,9 @@ public:
     ConnectionPtr GetConnection(int fd){
         return connections_[fd];
     }
+    size_t ConnectionNums() const{
+        return connections_.size();
+    }
 private:
     std::map<int,ConnectionPtr> connections_;
 };

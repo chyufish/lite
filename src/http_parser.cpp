@@ -2,265 +2,212 @@
 
 namespace lite {
 
-HttpParser::HttpParser()
-    : state_(method_start)
-{
-}
+HttpParser::HttpParser():state_(method_start){}
 
-void HttpParser::Reset()
-{
+void HttpParser::Reset(){
     state_ = method_start;
 }
 
-HttpParser::result_type HttpParser::Consume(Request &req, char input)
-{
-    switch (state_)
-    {
+HttpParser::result_type HttpParser::Consume(Request &req, char input){
+    switch (state_){
+
     case method_start:
-        if (!is_CHAR(input) || is_CTL(input) || is_separators(input))
-        {
+        if (!is_CHAR(input) || is_CTL(input) || is_separators(input)){
             return bad;
         }
-        else
-        {
+        else{
             state_ = method;
             req.method.push_back(input);
             return indeterminate;
         }
     case method:
-        if (input == ' ')
-        {
+        if (input == ' '){
             state_ = uri;
             return indeterminate;
         }
-        else if (!is_CHAR(input) || is_CTL(input) || is_separators(input))
-        {
+        else if (!is_CHAR(input) || is_CTL(input) || is_separators(input)){
             return bad;
         }
-        else
-        {
+        else{
             req.method.push_back(input);
             return indeterminate;
         }
     case uri:
-        if (input == ' ')
-        {
+        if (input == ' '){
             state_ = http_version_h;
             return indeterminate;
         }
-        else if (is_CTL(input))
-        {
+        else if (is_CTL(input)){
             return bad;
         }
-        else
-        {
+        else{
             req.uri.push_back(input);
             return indeterminate;
         }
     case http_version_h:
-        if (input == 'H')
-        {
+        if (input == 'H'){
             state_ = http_version_t_1;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case http_version_t_1:
-        if (input == 'T')
-        {
+        if (input == 'T'){
             state_ = http_version_t_2;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case http_version_t_2:
-        if (input == 'T')
-        {
+        if (input == 'T'){
             state_ = http_version_p;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case http_version_p:
-        if (input == 'P')
-        {
+        if (input == 'P'){
             state_ = http_version_slash;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case http_version_slash:
-        if (input == '/')
-        {
+        if (input == '/'){
             req.http_version_major = 0;
             req.http_version_minor = 0;
             state_ = http_version_major_start;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case http_version_major_start:
-        if (is_DIGIT(input))
-        {
+        if (is_DIGIT(input)){
             req.http_version_major = req.http_version_major * 10 + input - '0';
             state_ = http_version_major;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case http_version_major:
-        if (input == '.')
-        {
+        if (input == '.'){
             state_ = http_version_minor_start;
             return indeterminate;
         }
-        else if (is_DIGIT(input))
-        {
+        else if (is_DIGIT(input)){
             req.http_version_major = req.http_version_major * 10 + input - '0';
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case http_version_minor_start:
-        if (is_DIGIT(input))
-        {
+        if (is_DIGIT(input)){
             req.http_version_minor = req.http_version_minor * 10 + input - '0';
             state_ = http_version_minor;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case http_version_minor:
-        if (input == '\r')
-        {
+        if (input == '\r'){
             state_ = expecting_newline_1;
             return indeterminate;
         }
-        else if (is_DIGIT(input))
-        {
+        else if (is_DIGIT(input)){
             req.http_version_minor = req.http_version_minor * 10 + input - '0';
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case expecting_newline_1:
-        if (input == '\n')
-        {
+        if (input == '\n'){
             state_ = header_line_start;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case header_line_start:
-        if (input == '\r')
-        {
+        if (input == '\r'){
             state_ = expecting_newline_3;
             return indeterminate;
         }
-        else if (!req.headers.empty() && (input == ' ' || input == '\t'))
-        {
+        else if (!req.headers.empty() && (input == ' ' || input == '\t')){
             state_ = header_lws;
             return indeterminate;
         }
-        else if (!is_CHAR(input) || is_CTL(input) || is_separators(input))
-        {
+        else if (!is_CHAR(input) || is_CTL(input) || is_separators(input)){
             return bad;
         }
-        else
-        {
+        else{
             req.headers.push_back(Header());
             req.headers.back().name.push_back(input);
             state_ = header_name;
             return indeterminate;
         }
     case header_lws:
-        if (input == '\r')
-        {
+        if (input == '\r'){
             state_ = expecting_newline_2;
             return indeterminate;
         }
-        else if (input == ' ' || input == '\t')
-        {
+        else if (input == ' ' || input == '\t'){
             return indeterminate;
         }
-        else if (is_CTL(input))
-        {
+        else if (is_CTL(input)){
             return bad;
         }
-        else
-        {
+        else{
             state_ = header_value;
             req.headers.back().value.push_back(input);
             return indeterminate;
         }
     case header_name:
-        if (input == ':')
-        {
+        if (input == ':'){
             state_ = space_before_header_value;
             return indeterminate;
         }
-        else if (!is_CHAR(input) || is_CTL(input) || is_separators(input))
-        {
+        else if (!is_CHAR(input) || is_CTL(input) || is_separators(input)){
             return bad;
         }
-        else
-        {
+        else{
             req.headers.back().name.push_back(input);
             return indeterminate;
         }
     case space_before_header_value:
-        if (input == ' ')
-        {
+        if (input == ' '){
             state_ = header_value;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case header_value:
-        if (input == '\r')
-        {
+        if (input == '\r'){
             state_ = expecting_newline_2;
             return indeterminate;
         }
-        else if (is_CTL(input))
-        {
+        else if (is_CTL(input)){
             return bad;
         }
-        else
-        {
+        else{
             req.headers.back().value.push_back(input);
             return indeterminate;
         }
     case expecting_newline_2:
-        if (input == '\n')
-        {
+        if (input == '\n'){
             state_ = header_line_start;
             return indeterminate;
         }
-        else
-        {
+        else{
             return bad;
         }
     case expecting_newline_3:
@@ -270,19 +217,16 @@ HttpParser::result_type HttpParser::Consume(Request &req, char input)
     }
 }
 
-bool HttpParser::is_CHAR(int c)
-{
+bool HttpParser::is_CHAR(int c){
     return c >= 0 && c <= 127;
 }
-bool HttpParser::is_CTL(int c)
-{
+bool HttpParser::is_CTL(int c){
     return (c >= 0 && c <= 31) || (c == 127);
 }
 
 bool HttpParser::is_separators(int c)
 {
-    switch (c)
-    {
+    switch (c){
     case '(':
     case ')':
     case '<':
@@ -308,8 +252,7 @@ bool HttpParser::is_separators(int c)
     }
 }
 
-bool HttpParser::is_DIGIT(int c)
-{
+bool HttpParser::is_DIGIT(int c){
     return c >= '0' && c <= '9';
 }
 

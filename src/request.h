@@ -19,10 +19,12 @@ struct Request{
     int http_version_major;
     int http_version_minor;
     std::vector<Header> headers;
+    std::string body;
     void clear(){
         method.clear();
         uri.clear();
         headers.clear();
+        body.clear();
     }
 };
 
@@ -50,12 +52,13 @@ struct Response{
     std::vector<Header> headers;
 
     std::string contents;
-    int file_fd;
+
+    int file_fd=-1; //需要发送的文件fd，-1代表没有文件发送
     long file_size;
 
     static std::string ExtensionToType(std::string);
     static Response BuildResponse(Response::status_type status);
-    int WriteToBuffer(Buffer& buffer);
+    int WriteToBuffer(Buffer& buffer); //将response写入缓冲区
 };
 
 }

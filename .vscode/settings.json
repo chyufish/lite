@@ -42,7 +42,13 @@
         "atomic": "cpp",
         "cstdarg": "cpp",
         "deque": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "string": "cpp",
+        "cstddef": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "memory_resource": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false
 }

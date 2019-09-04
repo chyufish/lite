@@ -54,32 +54,4 @@ int LiteEvent::Wait(int timeout){
     return nfds;
 }
 
-/*
-bool LiteEvent::AddEvent(Connection_ptr conptr,int events){
-    struct epoll_event ev;
-    int old_events=conptr->Events();
-    int op=(old_events==0)?EPOLL_CTL_ADD:EPOLL_CTL_MOD;
-    ev.data.ptr=conptr.get();
-    ev.events=old_events | events;
-    if(epoll_ctl(epfd_,op,conptr->Fd(),&ev)==-1){
-        return false;
-    }
-    conptr->SetEvents(ev.events);
-    return true;
-}
-
-bool LiteEvent::DelEvent(Connection_ptr conptr,int events){
-    struct epoll_event ev;
-    int old_events=conptr->Events();
-    ev.data.ptr=conptr.get();
-    ev.events=old_events & ~events;
-    int op=(ev.events==0)?EPOLL_CTL_DEL:EPOLL_CTL_MOD;
-    if(epoll_ctl(epfd_,op,conptr->Fd(),&ev)==-1){
-        return false;
-    }
-    conptr->SetEvents(ev.events);
-    return true;
-}
-*/
-
 }

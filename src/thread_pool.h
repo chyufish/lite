@@ -8,7 +8,6 @@
 #include <condition_variable>
 #include <queue>
 #include <vector>
-#include <iostream>
 
 class ThreadPool{
 public:
@@ -74,7 +73,6 @@ inline bool ThreadPool::GetTask(Task& task){
     task=std::move(queue_.front());
     queue_.pop();
     queue_full_.notify_one();
-    //std::cout<<"gettask"<<std::endl;
 }
 
 template<typename FuncType>
@@ -83,7 +81,6 @@ void ThreadPool::Submit(FuncType func){
     queue_full_.wait(lk,[this](){return queue_.size()<max_queue_size_;});
     queue_.push(std::move(Task(func)));
     queue_empty_.notify_one();
-    //std::cout<<"submit"<<std::endl;
 }
 
 #endif

@@ -21,7 +21,8 @@ private:
     std::string dir_root_;
 
     void DoGet(Request& request,Response& response);
-    bool ParseUri(const std::string& uri,std::string& path);
+    void DoPost(Request& request,Response& response);
+    bool ParseUri(const std::string& uri,std::string& path,std::string& cgiargs);
 };
 
 }

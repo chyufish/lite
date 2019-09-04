@@ -3,7 +3,7 @@
 
 int main(int argc,char *argv[]){
     if(argc!=4){
-        std::cerr<<"Usage: ./lite_server address port dir_root"<<std::endl;
+        std::cerr<<"Usage: ./lite address port dir_root"<<std::endl;
         return 1;
     }
     lite::TcpServer server(argv[1],argv[2],argv[3]);
