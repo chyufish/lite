@@ -1,3 +1,4 @@
+VPATH=src
 cc = g++
 OBJ = lite.o lite_tcp.o lite_event.o connection.o request_handler.o http_parser.o request.o log.o
 
